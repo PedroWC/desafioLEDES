@@ -35,14 +35,17 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y docker-compose
 
     - name: Construir e iniciar contêineres
-      run: docker-compose up --build -d
+      run: docker-compose up --build
+
+    - name: Ver containers!
+      run: docker container ps
 
     - name: Aguardar os serviços estarem prontos
       run: |
         MAX_RETRIES=20
         RETRY_INTERVAL=40
         count=0
-        while ! docker-compose exec -T api curl -s http://localhost:8080/healthcheck; do
+        while ! docker-compose exec -T api curl -sf http://localhost:8080/healthcheck; do
           echo "Aguardando o serviço da API ficar pronto..."
           sleep $RETRY_INTERVAL
           count=$((count + 1))
@@ -51,6 +54,7 @@ jobs:
             exit 1
           fi
         done
+        echo "Serviço da API está pronto!"
 
     - name: Executar testes da API
       run: docker-compose exec -T api ./mvnw test
