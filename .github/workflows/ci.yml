@@ -39,16 +39,24 @@ jobs:
 
     - name: Aguardar os serviços estarem prontos
       run: |
-        while ! docker exec api curl -s http://localhost:8080/healthcheck; do
+        MAX_RETRIES=10
+        RETRY_INTERVAL=5
+        count=0
+        while ! docker-compose exec api curl -s http://localhost:8080/healthcheck; do
           echo "Aguardando o serviço da API ficar pronto..."
-          sleep 5
+          sleep $RETRY_INTERVAL
+          count=$((count + 1))
+          if [ $count -ge $MAX_RETRIES ]; then
+            echo "Número máximo de tentativas atingido. A API não está pronta."
+            exit 1
+          fi
         done
 
     - name: Executar testes da API
-      run: docker exec api ./mvnw test
+      run: docker-compose exec api ./mvnw test
 
     - name: Executar testes do Frontend
-      run: docker exec frontend npm test
+      run: docker-compose exec frontend npm test
 
     - name: Parar e remover contêineres
       run: docker-compose down
