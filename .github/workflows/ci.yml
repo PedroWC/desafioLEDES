@@ -42,7 +42,7 @@ jobs:
         MAX_RETRIES=10
         RETRY_INTERVAL=5
         count=0
-        while ! docker-compose exec api curl -s http://localhost:8080/healthcheck; do
+        while ! docker-compose exec -T api curl -s http://localhost:8080/healthcheck; do
           echo "Aguardando o serviço da API ficar pronto..."
           sleep $RETRY_INTERVAL
           count=$((count + 1))
@@ -53,10 +53,10 @@ jobs:
         done
 
     - name: Executar testes da API
-      run: docker-compose exec api ./mvnw test
+      run: docker-compose exec -T api ./mvnw test
 
     - name: Executar testes do Frontend
-      run: docker-compose exec frontend npm test
+      run: docker-compose exec -T frontend npm test
 
     - name: Parar e remover contêineres
       run: docker-compose down
