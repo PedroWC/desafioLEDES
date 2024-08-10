@@ -1,0 +1,45 @@
+name: Pipeline de CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Fazer checkout do código
+      uses: actions/checkout@v2
+
+    - name: Instalar JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
+    - name: Configurar Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Cachear camadas do Docker
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Instalar Docker Compose
+      run: sudo apt-get update && sudo apt-get install -y docker-compose
+
+    - name: Construir contêineres
+      run: docker-compose build
+
+    - name: Parar e remover contêineres
+      if: always()
+      run: docker-compose down
+
+    - name: Limpar imagens do Docker
+      if: always()
+      run: docker system prune -f
