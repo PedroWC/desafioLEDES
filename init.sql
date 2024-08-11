@@ -1,9 +1,10 @@
-CREATE DATABASE institute_manager;
+CREATE DATABASE IF NOT EXISTS institute_manager;
 USE institute_manager;
 CREATE TABLE instituicao (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(32) NOT NULL,
-    sigla VARCHAR(8) NOT NULL
+    sigla VARCHAR(8) NOT NULL,
+    status TINYINT(1) DEFAULT 1
 );
 CREATE TABLE instituicao_brasileira (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -23,6 +24,7 @@ CREATE TABLE instituicao_estrangeira (
     id INT AUTO_INCREMENT PRIMARY KEY,
     instituicao_id INT NOT NULL,
     pais VARCHAR(100) NOT NULL,
+    cnpj VARCHAR(14) NOT NULL,
     cep VARCHAR(9),
     logradouro VARCHAR(32) NOT NULL,
     estado_regiao VARCHAR(32) NOT NULL,

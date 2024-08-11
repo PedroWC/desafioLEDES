@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "instituicoes")
+@Table(name = "instituicao")
 public class Instituicao {
 
     @Id
@@ -23,4 +23,7 @@ public class Instituicao {
 
     @Column(nullable = false, length = 8)
     private String sigla;
+
+    @Column(nullable = false)
+    private Boolean status = true;
 }
