@@ -2,11 +2,11 @@ package com.ledes.desafio.institute_manager.service;
 
 import com.ledes.desafio.institute_manager.model.Instituicao;
 import com.ledes.desafio.institute_manager.repository.InstituicaoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,22 +19,26 @@ public class InstituicaoService {
         this.instituicaoRepository = instituicaoRepository;
     }
 
-    public List<Instituicao> getAllInstituicoes() {
-        return instituicaoRepository.findAll();
+    public void inativarInstituicao(Long id) {
+        Optional<Instituicao> optionalInstituicao = instituicaoRepository.findById(id);
+        if (optionalInstituicao.isPresent()) {
+            Instituicao instituicao = optionalInstituicao.get();
+            instituicao.setStatus(false);
+            instituicaoRepository.save(instituicao);
+        } else {
+            throw new EntityNotFoundException("Instituição não encontrada.");
+        }
     }
 
-    public Optional<Instituicao> getInstituicaoById(Long id) {
-        return instituicaoRepository.findById(id);
-    }
-
-    public Instituicao saveInstituicao(Instituicao instituicao) {
-        validateNome(instituicao.getNome());
-        validateSigla(instituicao.getSigla());
-        return instituicaoRepository.save(instituicao);
-    }
-
-    public void deleteInstituicao(Long id) {
-        instituicaoRepository.deleteById(id);
+    public void reativarInstituicao(Long id) {
+        Optional<Instituicao> optionalInstituicao = instituicaoRepository.findById(id);
+        if (optionalInstituicao.isPresent()) {
+            Instituicao instituicao = optionalInstituicao.get();
+            instituicao.setStatus(true);
+            instituicaoRepository.save(instituicao);
+        } else {
+            throw new EntityNotFoundException("Instituição não encontrada.");
+        }
     }
 
     public void validateNome(String nome) {

@@ -32,7 +32,7 @@ public class InstituicaoEstrangeira {
     @Column(nullable = false, length = 32)
     private String logradouro;
 
-    @Column(nullable = false, length = 32)
+    @Column(name = "estado_regiao", nullable = false, length = 32)
     private String estadoRegiao;
 
     @Column(nullable = false, length = 32)
