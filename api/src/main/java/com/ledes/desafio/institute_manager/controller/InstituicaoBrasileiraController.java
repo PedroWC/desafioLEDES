@@ -20,18 +20,6 @@ public class InstituicaoBrasileiraController {
         this.instituicaoBrasileiraService = instituicaoBrasileiraService;
     }
 
-    @GetMapping
-    public List<InstituicaoBrasileira> getAllInstituicoesBrasileiras() {
-        return instituicaoBrasileiraService.getAllInstituicoesBrasileiras();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<InstituicaoBrasileira> getInstituicaoBrasileiraById(
-            @PathVariable Long id) {
-        Optional<InstituicaoBrasileira> instituicao = instituicaoBrasileiraService.getInstituicaoBrasileiraById(id);
-        return instituicao.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @PostMapping
     public ResponseEntity<InstituicaoBrasileira> createInstituicaoBrasileira(
             @RequestBody InstituicaoBrasileira instituicaoBrasileira) {
@@ -48,17 +36,6 @@ public class InstituicaoBrasileiraController {
             return ResponseEntity.ok(updatedInstituicao);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInstituicaoBrasileira(
-            @PathVariable Long id) {
-        try {
-            instituicaoBrasileiraService.deleteInstituicaoBrasileira(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
         }
     }
 }
