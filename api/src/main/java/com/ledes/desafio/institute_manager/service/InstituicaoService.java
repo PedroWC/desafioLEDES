@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Serviço responsável por gerenciar as operações relacionadas às instituições,
+ * incluindo instituições brasileiras e estrangeiras.
+ */
 @Service
 public class InstituicaoService {
 
@@ -23,13 +27,27 @@ public class InstituicaoService {
     private final InstituicaoBrasileiraRepository instituicaoBrasileiraRepository;
     private final InstituicaoEstrangeiraRepository instituicaoEstrangeiraRepository;
 
+    /**
+     * Construtor para injeção das dependências necessárias.
+     *
+     * @param instituicaoRepository Repositório para operações de CRUD de Instituicao.
+     * @param instituicaoBrasileiraRepository Repositório para operações de CRUD de InstituicaoBrasileira.
+     * @param instituicaoEstrangeiraRepository Repositório para operações de CRUD de InstituicaoEstrangeira.
+     */
     @Autowired
-    public InstituicaoService(InstituicaoRepository instituicaoRepository, InstituicaoBrasileiraRepository instituicaoBrasileiraRepository, InstituicaoEstrangeiraRepository instituicaoEstrangeiraRepository) {
+    public InstituicaoService(InstituicaoRepository instituicaoRepository,
+                              InstituicaoBrasileiraRepository instituicaoBrasileiraRepository,
+                              InstituicaoEstrangeiraRepository instituicaoEstrangeiraRepository) {
         this.instituicaoRepository = instituicaoRepository;
         this.instituicaoBrasileiraRepository = instituicaoBrasileiraRepository;
         this.instituicaoEstrangeiraRepository = instituicaoEstrangeiraRepository;
     }
 
+    /**
+     * Retorna uma lista de todas as instituições detalhadas, incluindo tanto brasileiras quanto estrangeiras.
+     *
+     * @return Lista de InstituicaoDetalhada.
+     */
     public List<InstituicaoDetalhada> getAllInstituicoes() {
         List<InstituicaoDetalhada> todasInstituicoesDetalhadas = new ArrayList<>();
 
@@ -42,6 +60,13 @@ public class InstituicaoService {
         return todasInstituicoesDetalhadas;
     }
 
+    /**
+     * Busca uma instituição pelo ID, retornando uma InstituicaoDetalhada.
+     * Pode buscar tanto em InstituicaoBrasileira quanto em InstituicaoEstrangeira.
+     *
+     * @param id ID da instituição a ser buscada.
+     * @return Optional contendo a InstituicaoDetalhada se encontrada, ou vazio se não encontrada.
+     */
     public Optional<InstituicaoDetalhada> findInstituicaoById(Long id) {
         // Tenta encontrar na tabela de Instituicao Estrangeira
         Optional<InstituicaoEstrangeira> instituicaoEstrangeira = instituicaoEstrangeiraRepository.findById(id);
@@ -54,6 +79,11 @@ public class InstituicaoService {
         return instituicaoBrasileira.map(this::mapToInstituicaoDetalhada);
     }
 
+    /**
+     * Inativa uma instituição, alterando seu status para false.
+     *
+     * @param id ID da instituição a ser inativada.
+     */
     public void inativarInstituicao(Long id) {
         Optional<Instituicao> optionalInstituicao = instituicaoRepository.findById(id);
         if (optionalInstituicao.isPresent()) {
@@ -65,6 +95,11 @@ public class InstituicaoService {
         }
     }
 
+    /**
+     * Reativa uma instituição, alterando seu status para true.
+     *
+     * @param id ID da instituição a ser reativada.
+     */
     public void reativarInstituicao(Long id) {
         Optional<Instituicao> optionalInstituicao = instituicaoRepository.findById(id);
         if (optionalInstituicao.isPresent()) {
@@ -76,18 +111,40 @@ public class InstituicaoService {
         }
     }
 
+    /**
+     * Valida o nome da instituição, garantindo que não seja vazio e tenha no máximo 32 caracteres.
+     *
+     * @param nome Nome da instituição a ser validado.
+     */
     public void validateNome(String nome) {
         if (!StringUtils.hasText(nome) || nome.length() > 32) {
             throw new IllegalArgumentException("O nome deve ter no máximo 32 caracteres e não pode ser vazio.");
         }
     }
 
+    /**
+     * Valida a sigla da instituição, garantindo que não seja vazia e tenha no máximo 8 caracteres.
+     *
+     * @param sigla Sigla da instituição a ser validada.
+     */
     public void validateSigla(String sigla) {
         if (!StringUtils.hasText(sigla) || sigla.length() > 8) {
             throw new IllegalArgumentException("A sigla deve ter no máximo 8 caracteres e não pode ser vazia.");
         }
     }
 
+    /**
+     * Mapeia campos comuns entre InstituicaoBrasileira e InstituicaoEstrangeira para InstituicaoDetalhada.
+     *
+     * @param instituicaoDetalhada Objeto onde os campos serão mapeados.
+     * @param instituicao Objeto Instituicao com os dados a serem mapeados.
+     * @param pais País da instituição.
+     * @param cep CEP da instituição.
+     * @param logradouro Logradouro da instituição.
+     * @param estado Estado ou região da instituição.
+     * @param municipio Município da instituição.
+     * @param complemento Complemento do endereço da instituição.
+     */
     private void mapCommonFields(InstituicaoDetalhada instituicaoDetalhada,
                                  Instituicao instituicao, String pais, String cep,
                                  String logradouro, String estado,
@@ -104,6 +161,12 @@ public class InstituicaoService {
 
     }
 
+    /**
+     * Mapeia uma InstituicaoEstrangeira para uma InstituicaoDetalhada.
+     *
+     * @param instituicaoEstrangeira Instituição estrangeira a ser mapeada.
+     * @return Objeto InstituicaoDetalhada com os dados mapeados.
+     */
     private InstituicaoDetalhada mapToInstituicaoDetalhada(InstituicaoEstrangeira instituicaoEstrangeira) {
         InstituicaoDetalhada instituicaoDetalhada = new InstituicaoDetalhada();
         mapCommonFields(instituicaoDetalhada, instituicaoEstrangeira.getInstituicao(),
@@ -114,6 +177,12 @@ public class InstituicaoService {
         return instituicaoDetalhada;
     }
 
+    /**
+     * Mapeia uma InstituicaoBrasileira para uma InstituicaoDetalhada.
+     *
+     * @param instituicaoBrasileira Instituição brasileira a ser mapeada.
+     * @return Objeto InstituicaoDetalhada com os dados mapeados.
+     */
     private InstituicaoDetalhada mapToInstituicaoDetalhada(InstituicaoBrasileira instituicaoBrasileira) {
         InstituicaoDetalhada instituicaoDetalhada = new InstituicaoDetalhada();
         mapCommonFields(instituicaoDetalhada, instituicaoBrasileira.getInstituicao(),

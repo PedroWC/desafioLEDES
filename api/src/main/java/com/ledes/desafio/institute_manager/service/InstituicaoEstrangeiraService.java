@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+/**
+ * Serviço responsável por gerenciar as operações relacionadas às instituições estrangeiras.
+ */
 @Service
 public class InstituicaoEstrangeiraService {
 
@@ -17,12 +20,25 @@ public class InstituicaoEstrangeiraService {
     private final InstituicaoService instituicaoService;
     private static final Pattern CEP_PATTERN = Pattern.compile("\\d{1,9}");
 
+    /**
+     * Construtor para injeção das dependências necessárias.
+     *
+     * @param instituicaoEstrangeiraRepository Repositório para operações de CRUD de InstituicaoEstrangeira.
+     * @param instituicaoService Serviço para operações comuns a todas as instituições.
+     */
     @Autowired
     public InstituicaoEstrangeiraService(InstituicaoEstrangeiraRepository instituicaoEstrangeiraRepository, InstituicaoService instituicaoService) {
         this.instituicaoEstrangeiraRepository = instituicaoEstrangeiraRepository;
         this.instituicaoService = instituicaoService;
     }
 
+    /**
+     * Salva uma nova instituição estrangeira no banco de dados.
+     * Realiza validações do nome, sigla, CEP (se fornecido), e campos obrigatórios.
+     *
+     * @param instituicaoEstrangeira Instituição estrangeira a ser salva.
+     * @return A InstituicaoEstrangeira salva.
+     */
     public InstituicaoEstrangeira saveInstituicaoEstrangeira(InstituicaoEstrangeira instituicaoEstrangeira) {
         instituicaoService.validateNome(instituicaoEstrangeira.getInstituicao().getNome());
         instituicaoService.validateSigla(instituicaoEstrangeira.getInstituicao().getSigla());
@@ -30,13 +46,21 @@ public class InstituicaoEstrangeiraService {
         return instituicaoEstrangeiraRepository.save(instituicaoEstrangeira);
     }
 
+    /**
+     * Atualiza uma instituição estrangeira existente.
+     * Verifica se a instituição existe, se o país não é Brasil, e realiza as validações necessárias.
+     *
+     * @param id ID da instituição estrangeira a ser atualizada.
+     * @param updatedInstituicao Dados atualizados da instituição estrangeira.
+     * @return A InstituicaoEstrangeira atualizada.
+     */
     public InstituicaoEstrangeira updateInstituicaoEstrangeira(Long id, InstituicaoEstrangeira updatedInstituicao) {
         Optional<InstituicaoEstrangeira> existingInstituicaoOpt = instituicaoEstrangeiraRepository.findById(id);
 
         if (existingInstituicaoOpt.isPresent()) {
             InstituicaoEstrangeira existingInstituicao = existingInstituicaoOpt.get();
 
-            // Garantir que o país não seja alterado
+            // Garantir que o país não seja alterado para Brasil
             if ("Brasil".equals(existingInstituicao.getPais())) {
                 throw new IllegalArgumentException("Não é possível alterar uma instituição estrangeira para brasileira.");
             }
@@ -68,8 +92,12 @@ public class InstituicaoEstrangeiraService {
         }
     }
 
+    /**
+     * Valida os campos obrigatórios de uma instituição estrangeira.
+     *
+     * @param instituicaoEstrangeira Instituição estrangeira a ser validada.
+     */
     private void validateCamposObrigatorios(InstituicaoEstrangeira instituicaoEstrangeira) {
-        // As validações específicas para uma Instituição Estrangeira
         if (!StringUtils.hasText(instituicaoEstrangeira.getLogradouro()) || instituicaoEstrangeira.getLogradouro().length() > 32) {
             throw new IllegalArgumentException("O logradouro deve ter no máximo 32 caracteres e não pode ser vazio.");
         }
@@ -86,6 +114,11 @@ public class InstituicaoEstrangeiraService {
         }
     }
 
+    /**
+     * Valida uma instituição estrangeira, verificando o país, CEP (se fornecido) e os campos obrigatórios.
+     *
+     * @param instituicaoEstrangeira Instituição estrangeira a ser validada.
+     */
     private void validateInstituicaoEstrangeira(InstituicaoEstrangeira instituicaoEstrangeira) {
         // Validação do País
         if ("Brasil".equals(instituicaoEstrangeira.getPais())) {
