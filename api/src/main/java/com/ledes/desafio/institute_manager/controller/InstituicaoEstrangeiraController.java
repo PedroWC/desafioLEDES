@@ -20,17 +20,6 @@ public class InstituicaoEstrangeiraController {
         this.instituicaoEstrangeiraService = instituicaoEstrangeiraService;
     }
 
-    @GetMapping
-    public List<InstituicaoEstrangeira> getAllInstituicoesEstrangeiras() {
-        return instituicaoEstrangeiraService.getAllInstituicoesEstrangeiras();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<InstituicaoEstrangeira> getInstituicaoEstrangeiraById(@PathVariable Long id) {
-        Optional<InstituicaoEstrangeira> instituicao = instituicaoEstrangeiraService.getInstituicaoEstrangeiraById(id);
-        return instituicao.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @PostMapping
     public ResponseEntity<InstituicaoEstrangeira> createInstituicaoEstrangeira(@RequestBody InstituicaoEstrangeira instituicaoEstrangeira) {
         InstituicaoEstrangeira createdInstituicao = instituicaoEstrangeiraService.saveInstituicaoEstrangeira(instituicaoEstrangeira);
@@ -44,16 +33,6 @@ public class InstituicaoEstrangeiraController {
             return ResponseEntity.ok(updatedInstituicao);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInstituicaoEstrangeira(@PathVariable Long id) {
-        try {
-            instituicaoEstrangeiraService.deleteInstituicaoEstrangeira(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
         }
     }
 }
