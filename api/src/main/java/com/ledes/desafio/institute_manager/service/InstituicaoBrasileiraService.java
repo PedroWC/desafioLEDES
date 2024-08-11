@@ -24,23 +24,11 @@ public class InstituicaoBrasileiraService {
         this.instituicaoService = instituicaoService;
     }
 
-    public List<InstituicaoBrasileira> getAllInstituicoesBrasileiras() {
-        return instituicaoBrasileiraRepository.findAll();
-    }
-
-    public Optional<InstituicaoBrasileira> getInstituicaoBrasileiraById(Long id) {
-        return instituicaoBrasileiraRepository.findById(id);
-    }
-
     public InstituicaoBrasileira saveInstituicaoBrasileira(InstituicaoBrasileira instituicaoBrasileira) {
         instituicaoService.validateNome(instituicaoBrasileira.getInstituicao().getNome());
         instituicaoService.validateSigla(instituicaoBrasileira.getInstituicao().getSigla());
         validateInstituicaoBrasileira(instituicaoBrasileira);
         return instituicaoBrasileiraRepository.save(instituicaoBrasileira);
-    }
-
-    public void deleteInstituicaoBrasileira(Long id) {
-        instituicaoBrasileiraRepository.deleteById(id);
     }
 
     public InstituicaoBrasileira updateInstituicaoBrasileira(Long id, InstituicaoBrasileira updatedInstituicao) {

@@ -23,23 +23,11 @@ public class InstituicaoEstrangeiraService {
         this.instituicaoService = instituicaoService;
     }
 
-    public List<InstituicaoEstrangeira> getAllInstituicoesEstrangeiras() {
-        return instituicaoEstrangeiraRepository.findAll();
-    }
-
-    public Optional<InstituicaoEstrangeira> getInstituicaoEstrangeiraById(Long id) {
-        return instituicaoEstrangeiraRepository.findById(id);
-    }
-
     public InstituicaoEstrangeira saveInstituicaoEstrangeira(InstituicaoEstrangeira instituicaoEstrangeira) {
         instituicaoService.validateNome(instituicaoEstrangeira.getInstituicao().getNome());
         instituicaoService.validateSigla(instituicaoEstrangeira.getInstituicao().getSigla());
         validateInstituicaoEstrangeira(instituicaoEstrangeira);
         return instituicaoEstrangeiraRepository.save(instituicaoEstrangeira);
-    }
-
-    public void deleteInstituicaoEstrangeira(Long id) {
-        instituicaoEstrangeiraRepository.deleteById(id);
     }
 
     public InstituicaoEstrangeira updateInstituicaoEstrangeira(Long id, InstituicaoEstrangeira updatedInstituicao) {
