@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+/**
+ * Serviço responsável por gerenciar as operações relacionadas às instituições brasileiras.
+ */
 @Service
 public class InstituicaoBrasileiraService {
 
@@ -18,12 +21,25 @@ public class InstituicaoBrasileiraService {
     private static final Pattern CNPJ_PATTERN = Pattern.compile("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
     private static final Pattern CEP_PATTERN = Pattern.compile("\\d{5}-\\d{3}");
 
+    /**
+     * Construtor para injeção das dependências necessárias.
+     *
+     * @param instituicaoBrasileiraRepository Repositório para operações de CRUD de InstituiçãoBrasileira.
+     * @param instituicaoService Serviço para operações comuns a todas as instituições.
+     */
     @Autowired
     public InstituicaoBrasileiraService(InstituicaoBrasileiraRepository instituicaoBrasileiraRepository, InstituicaoService instituicaoService) {
         this.instituicaoBrasileiraRepository = instituicaoBrasileiraRepository;
         this.instituicaoService = instituicaoService;
     }
 
+    /**
+     * Salva uma nova instituição brasileira no banco de dados.
+     * Realiza validações do nome, sigla, CNPJ, CEP, e campos obrigatórios.
+     *
+     * @param instituicaoBrasileira Instituição brasileira a ser salva.
+     * @return A InstituiçãoBrasileira salva.
+     */
     public InstituicaoBrasileira saveInstituicaoBrasileira(InstituicaoBrasileira instituicaoBrasileira) {
         instituicaoService.validateNome(instituicaoBrasileira.getInstituicao().getNome());
         instituicaoService.validateSigla(instituicaoBrasileira.getInstituicao().getSigla());
@@ -31,6 +47,14 @@ public class InstituicaoBrasileiraService {
         return instituicaoBrasileiraRepository.save(instituicaoBrasileira);
     }
 
+    /**
+     * Atualiza uma instituição brasileira existente.
+     * Verifica se a instituição existe, se o país é Brasil, e realiza as validações necessárias.
+     *
+     * @param id ID da instituição brasileira a ser atualizada.
+     * @param updatedInstituicao Dados atualizados da instituição brasileira.
+     * @return A InstituiçãoBrasileira atualizada.
+     */
     public InstituicaoBrasileira updateInstituicaoBrasileira(Long id, InstituicaoBrasileira updatedInstituicao) {
         Optional<InstituicaoBrasileira> existingInstituicaoOpt = instituicaoBrasileiraRepository.findById(id);
 
@@ -77,8 +101,12 @@ public class InstituicaoBrasileiraService {
         }
     }
 
+    /**
+     * Valida os campos obrigatórios de uma instituição brasileira.
+     *
+     * @param instituicaoBrasileira Instituição brasileira a ser validada.
+     */
     private void validateCamposObrigatorios(InstituicaoBrasileira instituicaoBrasileira) {
-        // As validações específicas para uma Instituição Brasileira
         if (!StringUtils.hasText(instituicaoBrasileira.getLogradouro()) || instituicaoBrasileira.getLogradouro().length() > 32) {
             throw new IllegalArgumentException("O logradouro deve ter no máximo 32 caracteres e não pode ser vazio.");
         }
@@ -95,29 +123,29 @@ public class InstituicaoBrasileiraService {
             throw new IllegalArgumentException("O número deve ter no máximo 8 caracteres e não pode ser vazio.");
         }
 
-        // Validação do complemento (campo opcional)
         if (instituicaoBrasileira.getComplemento() != null && instituicaoBrasileira.getComplemento().length() > 16) {
             throw new IllegalArgumentException("O complemento deve ter no máximo 16 caracteres.");
         }
     }
 
+    /**
+     * Valida uma instituição brasileira, verificando país, CNPJ, CEP e campos obrigatórios.
+     *
+     * @param instituicaoBrasileira Instituição brasileira a ser validada.
+     */
     private void validateInstituicaoBrasileira(InstituicaoBrasileira instituicaoBrasileira) {
-        // Validação do País
         if (!"Brasil".equals(instituicaoBrasileira.getPais())) {
             throw new IllegalArgumentException("O país deve ser Brasil para uma Instituição Brasileira.");
         }
 
-        // Validação do CNPJ
         if (!CNPJ_PATTERN.matcher(instituicaoBrasileira.getCnpj()).matches()) {
             throw new IllegalArgumentException("O CNPJ deve estar no formato XX.XXX.XXX/XXXX-XX.");
         }
 
-        // Validação do CEP
         if (!CEP_PATTERN.matcher(instituicaoBrasileira.getCep()).matches()) {
             throw new IllegalArgumentException("O CEP deve estar no formato XXXXX-XXX.");
         }
 
-        // Validação dos campos obrigatórios
         validateCamposObrigatorios(instituicaoBrasileira);
     }
 }
