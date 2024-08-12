@@ -1,0 +1,14 @@
+.botao-voltar {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.icone-voltar {
+    margin-right: 8px;
+    font-size: 24px;
+}

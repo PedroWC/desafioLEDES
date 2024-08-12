@@ -1,26 +1,39 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import InstitutionList from './pages/InstitutionList';
+import BotaoVoltar from './components/BotaoVoltar';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App: React.FC = () => {
+    return (
+        <Router>
+            <div style={{ position: 'relative', width: '100%', height: '100vh', fontFamily: 'Arial, sans-serif' }}>
+                <BotaoVoltar />
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%'
+                    }}
+                >
+                    <Routes>
+                        <Route path="/" element={
+                            <div>
+                                <h2 style={{ textAlign: 'center' }}>Bem-vindo ao sistema</h2>
+                                <button
+                                    style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}
+                                    onClick={() => window.location.href = '/institutions'}
+                                >
+                                    Ver Lista de Instituições
+                                </button>
+                            </div>
+                        } />
+                        <Route path="/institutions" element={<InstitutionList />} />
+                    </Routes>
+                </div>
+            </div>
+        </Router>
+    );
+};
 
 export default App;
