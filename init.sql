@@ -24,7 +24,6 @@ CREATE TABLE instituicao_estrangeira (
     id INT AUTO_INCREMENT PRIMARY KEY,
     instituicao_id INT NOT NULL,
     pais VARCHAR(100) NOT NULL,
-    cnpj VARCHAR(14) NOT NULL,
     cep VARCHAR(9),
     logradouro VARCHAR(32) NOT NULL,
     estado_regiao VARCHAR(32) NOT NULL,
