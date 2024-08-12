@@ -151,6 +151,7 @@ public class InstituicaoService {
                                  String municipio, String complemento) {
         instituicaoDetalhada.setId(instituicao.getId());
         instituicaoDetalhada.setNome(instituicao.getNome());
+        instituicaoDetalhada.setSigla(instituicao.getSigla());
         instituicaoDetalhada.setStatus(instituicao.getStatus());
         instituicaoDetalhada.setPais(pais);
         instituicaoDetalhada.setCep(cep);
@@ -191,6 +192,7 @@ public class InstituicaoService {
                 instituicaoBrasileira.getMunicipio(), instituicaoBrasileira.getComplemento());
         instituicaoDetalhada.setBairro(instituicaoBrasileira.getBairro());
         instituicaoDetalhada.setNumero(instituicaoBrasileira.getNumero());
+        instituicaoDetalhada.setCnpj(instituicaoBrasileira.getCnpj());
 
         return instituicaoDetalhada;
     }
