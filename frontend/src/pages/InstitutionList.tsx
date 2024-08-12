@@ -20,7 +20,7 @@ import api from '../api/axiosConfig';
 import { Institution } from '../types/Institution';
 import './InstitutionList.css';
 
-const ListaInstituicoes: React.FC = () => {
+const InstitutionList: React.FC = () => {
     const [instituicoes, setInstituicoes] = useState<Institution[]>([]);
     const [pagina, setPagina] = useState(0);
     const [linhasPorPagina, setLinhasPorPagina] = useState(5);
@@ -115,7 +115,7 @@ const ListaInstituicoes: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {instituicoes
+                        {Array.isArray(instituicoes) && instituicoes
                             .slice(pagina * linhasPorPagina, pagina * linhasPorPagina + linhasPorPagina)
                             .map((instituicao) => (
                                 <TableRow key={instituicao.id} style={{ backgroundColor: instituicao.status ? '#fff' : '#f2f2f2' }}>
@@ -163,4 +163,4 @@ const ListaInstituicoes: React.FC = () => {
     );
 };
 
-export default ListaInstituicoes;
+export default InstitutionList;

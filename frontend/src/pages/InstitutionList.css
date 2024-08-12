@@ -4,20 +4,19 @@
     padding: 3%;
 }
 
-.header {
+.cabecalho {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
 }
 
-.add-button {
+.botao-adicionar {
     color: #28a745 !important;
     font-size: 16px !important;
 }
 
-
-h1.title {
+h1.titulo {
     text-align: left;
     color: #000000;
 }
@@ -43,25 +42,25 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-.action-icons {
+.icones-acao {
     cursor: pointer;
-    margin-right: 15px; /* Adiciona espaçamento entre os ícones */
+    margin-right: 15px;
 }
 
-.activate-button {
+.botao-ativar {
     background-color: #4CAF50;
     color: white;
     border: none;
     padding: 5px 10px;
     cursor: pointer;
-    margin-left: 15px; /* Adiciona espaçamento à esquerda do botão */
+    margin-left: 15px;
 }
 
-.flag-icon {
-    border-radius: 50%; /* Torna a bandeira arredondada */
-    width: 20px; /* Mantém o tamanho da bandeira */
-    height: 20px; /* Mantém o tamanho da bandeira */
+icone-bandeira {
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
     display: inline-block;
     vertical-align: middle;
-    margin-right: 8px; /* Adiciona espaço entre a bandeira e o nome do país */
+    margin-right: 8px;
 }
