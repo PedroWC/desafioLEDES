@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InstitutionList from './pages/InstitutionList';
 import BotaoVoltar from './components/BotaoVoltar';
+import InstituicaoForm from './pages/InstituicaoForm';
 
 const App: React.FC = () => {
     return (
@@ -29,6 +30,7 @@ const App: React.FC = () => {
                             </div>
                         } />
                         <Route path="/institutions" element={<InstitutionList />} />
+                        <Route path="/institutions/create" element={<InstituicaoForm />} />
                     </Routes>
                 </div>
             </div>

@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Nome da Instituição"
+    },
+    "sigla": {
+      "type": "string",
+      "minLength": 2,
+      "description": "Sigla da Instituição"
+    },
+    "cnpj": {
+      "type": "string",
+      "minLength": 14,
+      "maxLength": 14,
+      "description": "CNPJ da Instituição"
+    }
+  },
+  "required": ["nome", "sigla", "cnpj"]
+}

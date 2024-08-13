@@ -1,0 +1,26 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Group",
+      "label": "Dados da Instituição",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/nome",
+          "label": "Nome"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/sigla",
+          "label": "Sigla"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/cnpj",
+          "label": "CNPJ"
+        }
+      ]
+    }
+  ]
+}

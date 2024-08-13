@@ -16,14 +16,16 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import { Institution } from '../types/Institution';
-import './InstitutionList.css';
+import '../styles/InstitutionList.css';
 
-const ListaInstituicoes: React.FC = () => {
+const InstitutionList: React.FC = () => {
     const [instituicoes, setInstituicoes] = useState<Institution[]>([]);
     const [pagina, setPagina] = useState(0);
     const [linhasPorPagina, setLinhasPorPagina] = useState(5);
+    const navigate = useNavigate();
 
     useEffect(() => {
         api.get('/api/instituicao')
@@ -97,9 +99,7 @@ const ListaInstituicoes: React.FC = () => {
                     variant="text"
                     startIcon={<AddIcon />}
                     className="botao-adicionar"
-                    onClick={() => {
-                        console.log('Adicionar nova instituição');
-                    }}
+                    onClick={() => navigate('/institutions/create')}
                 >
                     ADICIONAR
                 </Button>
@@ -115,7 +115,7 @@ const ListaInstituicoes: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {instituicoes
+                        {Array.isArray(instituicoes) && instituicoes
                             .slice(pagina * linhasPorPagina, pagina * linhasPorPagina + linhasPorPagina)
                             .map((instituicao) => (
                                 <TableRow key={instituicao.id} style={{ backgroundColor: instituicao.status ? '#fff' : '#f2f2f2' }}>
@@ -163,4 +163,4 @@ const ListaInstituicoes: React.FC = () => {
     );
 };
 
-export default ListaInstituicoes;
+export default InstitutionList;
