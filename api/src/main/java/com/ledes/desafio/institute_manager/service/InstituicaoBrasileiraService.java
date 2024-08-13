@@ -1,25 +1,24 @@
 package com.ledes.desafio.institute_manager.service;
 
+import com.ledes.desafio.institute_manager.model.Instituicao;
 import com.ledes.desafio.institute_manager.model.InstituicaoBrasileira;
 import com.ledes.desafio.institute_manager.repository.InstituicaoBrasileiraRepository;
+import com.ledes.desafio.institute_manager.repository.InstituicaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /**
- * Serviço responsável por gerenciar as operações relacionadas às instituições brasileiras.
+ * Serviço responsável por gerir as operações relacionadas às instituições brasileiras.
  */
 @Service
 public class InstituicaoBrasileiraService {
 
     private final InstituicaoBrasileiraRepository instituicaoBrasileiraRepository;
+    private final InstituicaoRepository instituicaoRepository;
     private final InstituicaoService instituicaoService;
-    private static final Pattern CNPJ_PATTERN = Pattern.compile("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
-    private static final Pattern CEP_PATTERN = Pattern.compile("\\d{5}-\\d{3}");
 
     /**
      * Construtor para injeção das dependências necessárias.
@@ -28,8 +27,9 @@ public class InstituicaoBrasileiraService {
      * @param instituicaoService Serviço para operações comuns a todas as instituições.
      */
     @Autowired
-    public InstituicaoBrasileiraService(InstituicaoBrasileiraRepository instituicaoBrasileiraRepository, InstituicaoService instituicaoService) {
+    public InstituicaoBrasileiraService(InstituicaoBrasileiraRepository instituicaoBrasileiraRepository, InstituicaoRepository instituicaoRepository, InstituicaoService instituicaoService) {
         this.instituicaoBrasileiraRepository = instituicaoBrasileiraRepository;
+        this.instituicaoRepository = instituicaoRepository;
         this.instituicaoService = instituicaoService;
     }
 
@@ -44,6 +44,12 @@ public class InstituicaoBrasileiraService {
         instituicaoService.validateNome(instituicaoBrasileira.getInstituicao().getNome());
         instituicaoService.validateSigla(instituicaoBrasileira.getInstituicao().getSigla());
         validateInstituicaoBrasileira(instituicaoBrasileira);
+
+        Instituicao instituicao = instituicaoBrasileira.getInstituicao();
+        Instituicao savedInstituicao = instituicaoRepository.save(instituicao);
+
+        instituicaoBrasileira.setInstituicao(savedInstituicao);
+
         return instituicaoBrasileiraRepository.save(instituicaoBrasileira);
     }
 
@@ -51,51 +57,49 @@ public class InstituicaoBrasileiraService {
      * Atualiza uma instituição brasileira existente.
      * Verifica se a instituição existe, se o país é Brasil, e realiza as validações necessárias.
      *
-     * @param id ID da instituição brasileira a ser atualizada.
+     * @param id ‘ID’ da instituição brasileira a ser atualizada.
      * @param updatedInstituicao Dados atualizados da instituição brasileira.
      * @return A InstituiçãoBrasileira atualizada.
      */
     public InstituicaoBrasileira updateInstituicaoBrasileira(Long id, InstituicaoBrasileira updatedInstituicao) {
-        Optional<InstituicaoBrasileira> existingInstituicaoOpt = instituicaoBrasileiraRepository.findById(id);
+        Optional<Instituicao> instituicaoOptional = instituicaoRepository.findById(id);
 
-        if (existingInstituicaoOpt.isPresent()) {
-            InstituicaoBrasileira existingInstituicao = existingInstituicaoOpt.get();
+        if (instituicaoOptional.isPresent()) {
+            Instituicao instituicao = instituicaoOptional.get();
 
-            // Garantir que o país não seja alterado
-            if (!"Brasil".equals(existingInstituicao.getPais())) {
-                throw new IllegalArgumentException("Não é possível alterar uma instituição brasileira para estrangeira.");
+            Optional<InstituicaoBrasileira> instituicaoBrasileiraOptional = instituicaoBrasileiraRepository.findByInstituicao(instituicao);
+
+            if (instituicaoBrasileiraOptional.isPresent()) {
+                InstituicaoBrasileira existingInstituicao = instituicaoBrasileiraOptional.get();
+
+                // Garantir que o país não seja alterado
+                if (!"Brasil".equals(existingInstituicao.getPais())) {
+                    throw new IllegalArgumentException("Não é possível alterar uma instituição brasileira para estrangeira.");
+                }
+
+                // Validações comuns
+                instituicaoService.validateNome(updatedInstituicao.getInstituicao().getNome());
+                instituicaoService.validateSigla(updatedInstituicao.getInstituicao().getSigla());
+
+                // Validação de campos obrigatórios
+                validateCamposObrigatorios(updatedInstituicao);
+
+                // Atualizando os campos permitidos
+                existingInstituicao.getInstituicao().setNome(updatedInstituicao.getInstituicao().getNome());
+                existingInstituicao.getInstituicao().setSigla(updatedInstituicao.getInstituicao().getSigla());
+                existingInstituicao.setCnpj(updatedInstituicao.getCnpj());
+                existingInstituicao.setCep(updatedInstituicao.getCep());
+                existingInstituicao.setLogradouro(updatedInstituicao.getLogradouro());
+                existingInstituicao.setBairro(updatedInstituicao.getBairro());
+                existingInstituicao.setEstado(updatedInstituicao.getEstado());
+                existingInstituicao.setMunicipio(updatedInstituicao.getMunicipio());
+                existingInstituicao.setNumero(updatedInstituicao.getNumero());
+                existingInstituicao.setComplemento(updatedInstituicao.getComplemento());
+
+                return instituicaoBrasileiraRepository.save(existingInstituicao);
+            } else {
+                throw new IllegalArgumentException("Instituição não encontrada.");
             }
-
-            // Validações comuns
-            instituicaoService.validateNome(updatedInstituicao.getInstituicao().getNome());
-            instituicaoService.validateSigla(updatedInstituicao.getInstituicao().getSigla());
-
-            // Validação do CNPJ
-            if (!CNPJ_PATTERN.matcher(updatedInstituicao.getCnpj()).matches()) {
-                throw new IllegalArgumentException("O CNPJ deve estar no formato XX.XXX.XXX/XXXX-XX.");
-            }
-
-            // Validação do CEP
-            if (!CEP_PATTERN.matcher(updatedInstituicao.getCep()).matches()) {
-                throw new IllegalArgumentException("O CEP deve estar no formato XXXXX-XXX.");
-            }
-
-            // Validação de campos obrigatórios
-            validateCamposObrigatorios(updatedInstituicao);
-
-            // Atualizando os campos permitidos
-            existingInstituicao.getInstituicao().setNome(updatedInstituicao.getInstituicao().getNome());
-            existingInstituicao.getInstituicao().setSigla(updatedInstituicao.getInstituicao().getSigla());
-            existingInstituicao.setCnpj(updatedInstituicao.getCnpj());
-            existingInstituicao.setCep(updatedInstituicao.getCep());
-            existingInstituicao.setLogradouro(updatedInstituicao.getLogradouro());
-            existingInstituicao.setBairro(updatedInstituicao.getBairro());
-            existingInstituicao.setEstado(updatedInstituicao.getEstado());
-            existingInstituicao.setMunicipio(updatedInstituicao.getMunicipio());
-            existingInstituicao.setNumero(updatedInstituicao.getNumero());
-            existingInstituicao.setComplemento(updatedInstituicao.getComplemento());
-
-            return instituicaoBrasileiraRepository.save(existingInstituicao);
         } else {
             throw new IllegalArgumentException("Instituição não encontrada.");
         }
@@ -136,14 +140,6 @@ public class InstituicaoBrasileiraService {
     private void validateInstituicaoBrasileira(InstituicaoBrasileira instituicaoBrasileira) {
         if (!"Brasil".equals(instituicaoBrasileira.getPais())) {
             throw new IllegalArgumentException("O país deve ser Brasil para uma Instituição Brasileira.");
-        }
-
-        if (!CNPJ_PATTERN.matcher(instituicaoBrasileira.getCnpj()).matches()) {
-            throw new IllegalArgumentException("O CNPJ deve estar no formato XX.XXX.XXX/XXXX-XX.");
-        }
-
-        if (!CEP_PATTERN.matcher(instituicaoBrasileira.getCep()).matches()) {
-            throw new IllegalArgumentException("O CEP deve estar no formato XXXXX-XXX.");
         }
 
         validateCamposObrigatorios(instituicaoBrasileira);

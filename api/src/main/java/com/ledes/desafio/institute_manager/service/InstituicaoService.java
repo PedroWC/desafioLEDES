@@ -68,16 +68,29 @@ public class InstituicaoService {
      * @return Optional contendo a InstituicaoDetalhada se encontrada, ou vazio se não encontrada.
      */
     public Optional<InstituicaoDetalhada> findInstituicaoById(Long id) {
-        // Tenta encontrar na tabela de Instituicao Estrangeira
-        Optional<InstituicaoEstrangeira> instituicaoEstrangeira = instituicaoEstrangeiraRepository.findById(id);
-        if (instituicaoEstrangeira.isPresent()) {
-            return Optional.of(mapToInstituicaoDetalhada(instituicaoEstrangeira.get()));
+        // Tenta encontrar a instituição pela ID na tabela 'instituicao'
+        Optional<Instituicao> instituicaoOptional = instituicaoRepository.findById(id);
+
+        if (instituicaoOptional.isPresent()) {
+            Instituicao instituicao = instituicaoOptional.get();
+
+            // Tenta encontrar a instituição correspondente na tabela de InstituicaoBrasileira
+            Optional<InstituicaoBrasileira> instituicaoBrasileiraOptional = instituicaoBrasileiraRepository.findByInstituicao(instituicao);
+            if (instituicaoBrasileiraOptional.isPresent()) {
+                return Optional.of(mapToInstituicaoDetalhada(instituicaoBrasileiraOptional.get()));
+            }
+
+            // Tenta encontrar a instituição correspondente na tabela de InstituicaoEstrangeira
+            Optional<InstituicaoEstrangeira> instituicaoEstrangeiraOptional = instituicaoEstrangeiraRepository.findByInstituicao(instituicao);
+            if (instituicaoEstrangeiraOptional.isPresent()) {
+                return Optional.of(mapToInstituicaoDetalhada(instituicaoEstrangeiraOptional.get()));
+            }
         }
 
-        // Tenta encontrar na tabela de Instituicao Brasileira
-        Optional<InstituicaoBrasileira> instituicaoBrasileira = instituicaoBrasileiraRepository.findById(id);
-        return instituicaoBrasileira.map(this::mapToInstituicaoDetalhada);
+        // Caso não encontre a instituição, retorna um Optional vazio
+        return Optional.empty();
     }
+
 
     /**
      * Inativa uma instituição, alterando seu status para false.
