@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "cep": {
+      "type": "string",
+      "title": "CEP",
+      "maxLength": 9
+    },
+    "logradouro": {
+      "type": "string",
+      "title": "Logradouro",
+      "maxLength": 32,
+      "minLength": 1
+    },
+    "complemento": {
+      "type": "string",
+      "title": "Complemento",
+      "maxLength": 32
+    },
+    "estado": {
+      "type": "string",
+      "title": "Estado",
+      "maxLength": 32,
+      "minLength": 1
+    },
+    "municipio": {
+      "type": "string",
+      "title": "Município",
+      "maxLength": 32,
+      "minLength": 1
+    }
+  },
+  "required": ["cep", "logradouro", "estado", "municipio"]
+}

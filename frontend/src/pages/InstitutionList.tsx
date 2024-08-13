@@ -18,6 +18,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
+import ibgeApi from '../api/ibgeApi';  // Importar sua instância da API do IBGE
 import { Institution } from '../types/Institution';
 import '../styles/InstitutionList.css';
 
@@ -25,6 +26,7 @@ const InstitutionList: React.FC = () => {
     const [instituicoes, setInstituicoes] = useState<Institution[]>([]);
     const [pagina, setPagina] = useState(0);
     const [linhasPorPagina, setLinhasPorPagina] = useState(5);
+    const [countryFlagMap, setCountryFlagMap] = useState<{ [key: string]: string }>({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,7 +37,24 @@ const InstitutionList: React.FC = () => {
             .catch(erro => {
                 console.error('Houve um erro ao buscar as instituições!', erro);
             });
+
+        // Requisição para obter o mapeamento de países e bandeiras
+        ibgeApi.get('/')
+            .then(resposta => {
+                const countryMap: { [key: string]: string } = {};
+                resposta.data.forEach((country: any) => {
+                    countryMap[country.nome.abreviado.toLowerCase()] = country.id['ISO-3166-1-ALPHA-2'].toLowerCase();
+                });
+                setCountryFlagMap(countryMap);
+            })
+            .catch(erro => {
+                console.error('Erro ao buscar os países do IBGE!', erro);
+            });
     }, []);
+
+    const obterCodigoBandeira = (pais: string) => {
+        return countryFlagMap[pais.toLowerCase()] || '';
+    };
 
     const ativarInstituicao = (id: number) => {
         if (window.confirm('Você realmente deseja ativar esta instituição?')) {
@@ -66,19 +85,6 @@ const InstitutionList: React.FC = () => {
                 .catch(erro => {
                     console.error('Houve um erro ao inativar a instituição!', erro);
                 });
-        }
-    };
-
-    const obterCodigoBandeira = (pais: string) => {
-        switch (pais.toLowerCase()) {
-            case 'brasil':
-                return 'br';
-            case 'estados unidos':
-                return 'us';
-            case 'reino unido':
-                return 'gb';
-            default:
-                return '';
         }
     };
 
@@ -122,24 +128,29 @@ const InstitutionList: React.FC = () => {
                                     <TableCell>{instituicao.nome}</TableCell>
                                     <TableCell>{instituicao.sigla || 'N/A'}</TableCell>
                                     <TableCell>
-                                        <img src={`https://flagcdn.com/w20/${obterCodigoBandeira(instituicao.pais)}.png`} alt={instituicao.pais} className="icone-bandeira" /> {instituicao.pais}
+                                        <img
+                                            src={`https://flagcdn.com/w20/${obterCodigoBandeira(instituicao.pais)}.png`}
+                                            alt={instituicao.pais}
+                                            className="icone-bandeira"
+                                        />
+                                        {instituicao.pais}
                                     </TableCell>
                                     <TableCell>
                                         {instituicao.status ? (
                                             <>
-                                                <IconButton className="icones-acao">
-                                                    <VisibilityIcon sx={{ color: '#6c757d' }} /> {/* Cinza para Visualizar */}
+                                                <IconButton className="icones-acao" onClick={() => navigate(`/institutions/view/${instituicao.id}`)}>
+                                                    <VisibilityIcon sx={{ color: '#6c757d' }} />
                                                 </IconButton>
-                                                <IconButton className="icones-acao">
-                                                    <EditIcon sx={{ color: '#1E90FF' }} /> {/* Azul Claro para Editar */}
+                                                <IconButton className="icones-acao" onClick={() => navigate(`/institutions/edit/${instituicao.id}`)}>
+                                                    <EditIcon sx={{ color: '#1E90FF' }} />
                                                 </IconButton>
                                                 <IconButton className="icones-acao" onClick={() => desativarInstituicao(instituicao.id)}>
-                                                    <BlockIcon sx={{ color: '#dc3545' }} /> {/* Vermelho para Inativar */}
+                                                    <BlockIcon sx={{ color: '#dc3545' }} />
                                                 </IconButton>
                                             </>
                                         ) : (
                                             <IconButton className="icones-acao" onClick={() => ativarInstituicao(instituicao.id)}>
-                                                <CheckCircleIcon sx={{ color: '#28a745' }} /> {/* Verde para Ativar */}
+                                                <CheckCircleIcon sx={{ color: '#28a745' }} />
                                             </IconButton>
                                         )}
                                     </TableCell>

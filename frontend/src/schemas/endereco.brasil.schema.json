@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "properties": {
+    "cnpj": {
+      "type": "string",
+      "title": "CNPJ",
+      "maxLength": 14,
+      "minLength": 14
+    },
+    "cep": {
+      "type": "string",
+      "title": "CEP",
+      "maxLength": 8,
+      "minLength": 8
+    },
+    "estado": {
+      "type": "string",
+      "title": "Estado"
+    },
+    "logradouro": {
+      "type": "string",
+      "title": "Logradouro"
+    },
+    "numero": {
+      "type": "string",
+      "title": "Número",
+      "maxLength": 8,
+      "minLength": 1
+    },
+    "municipio": {
+      "type": "string",
+      "title": "Município"
+    },
+    "bairro": {
+      "type": "string",
+      "title": "Bairro"
+    },
+    "complemento": {
+      "type": "string",
+      "title": "Complemento",
+      "maxLength": 16
+    }
+  },
+  "required": ["cep", "estado", "logradouro", "numero", "pais", "municipio", "bairro"]
+}
