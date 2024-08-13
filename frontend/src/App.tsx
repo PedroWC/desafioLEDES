@@ -30,7 +30,9 @@ const App: React.FC = () => {
                             </div>
                         } />
                         <Route path="/institutions" element={<InstitutionList />} />
-                        <Route path="/institutions/create" element={<InstituicaoForm />} />
+                        <Route path="/institutions/create" element={<InstituicaoForm mode="create" />} />
+                        <Route path="/institutions/edit/:id" element={<InstituicaoForm mode="edit" />} />
+                        <Route path="/institutions/view/:id" element={<InstituicaoForm mode="view" />} />
                     </Routes>
                 </div>
             </div>

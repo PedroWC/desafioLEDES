@@ -1,0 +1,13 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    { "type": "Control", "scope": "#/properties/cnpj" },
+    { "type": "Control", "scope": "#/properties/cep" },
+    { "type": "Control", "scope": "#/properties/estado" },
+    { "type": "Control", "scope": "#/properties/logradouro" },
+    { "type": "Control", "scope": "#/properties/numero" },
+    { "type": "Control", "scope": "#/properties/municipio" },
+    { "type": "Control", "scope": "#/properties/bairro" },
+    { "type": "Control", "scope": "#/properties/complemento" }
+  ]
+}
