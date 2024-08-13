@@ -1,22 +1,24 @@
 package com.ledes.desafio.institute_manager.service;
 
+import com.ledes.desafio.institute_manager.model.Instituicao;
 import com.ledes.desafio.institute_manager.model.InstituicaoEstrangeira;
 import com.ledes.desafio.institute_manager.repository.InstituicaoEstrangeiraRepository;
+import com.ledes.desafio.institute_manager.repository.InstituicaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Serviço responsável por gerenciar as operações relacionadas às instituições estrangeiras.
+ * Serviço responsável por gerir as operações relacionadas às instituições estrangeiras.
  */
 @Service
 public class InstituicaoEstrangeiraService {
 
     private final InstituicaoEstrangeiraRepository instituicaoEstrangeiraRepository;
+    private final InstituicaoRepository instituicaoRepository;
     private final InstituicaoService instituicaoService;
     private static final Pattern CEP_PATTERN = Pattern.compile("\\d{1,9}");
 
@@ -27,8 +29,9 @@ public class InstituicaoEstrangeiraService {
      * @param instituicaoService Serviço para operações comuns a todas as instituições.
      */
     @Autowired
-    public InstituicaoEstrangeiraService(InstituicaoEstrangeiraRepository instituicaoEstrangeiraRepository, InstituicaoService instituicaoService) {
+    public InstituicaoEstrangeiraService(InstituicaoEstrangeiraRepository instituicaoEstrangeiraRepository, InstituicaoRepository instituicaoRepository, InstituicaoService instituicaoService) {
         this.instituicaoEstrangeiraRepository = instituicaoEstrangeiraRepository;
+        this.instituicaoRepository = instituicaoRepository;
         this.instituicaoService = instituicaoService;
     }
 
@@ -43,6 +46,12 @@ public class InstituicaoEstrangeiraService {
         instituicaoService.validateNome(instituicaoEstrangeira.getInstituicao().getNome());
         instituicaoService.validateSigla(instituicaoEstrangeira.getInstituicao().getSigla());
         validateInstituicaoEstrangeira(instituicaoEstrangeira);
+
+        Instituicao instituicao = instituicaoEstrangeira.getInstituicao();
+        Instituicao savedInstituicao = instituicaoRepository.save(instituicao);
+
+        instituicaoEstrangeira.setInstituicao(savedInstituicao);
+
         return instituicaoEstrangeiraRepository.save(instituicaoEstrangeira);
     }
 
@@ -50,43 +59,50 @@ public class InstituicaoEstrangeiraService {
      * Atualiza uma instituição estrangeira existente.
      * Verifica se a instituição existe, se o país não é Brasil, e realiza as validações necessárias.
      *
-     * @param id ID da instituição estrangeira a ser atualizada.
+     * @param id ‘ID’ da instituição estrangeira a ser atualizada.
      * @param updatedInstituicao Dados atualizados da instituição estrangeira.
      * @return A InstituicaoEstrangeira atualizada.
      */
     public InstituicaoEstrangeira updateInstituicaoEstrangeira(Long id, InstituicaoEstrangeira updatedInstituicao) {
-        Optional<InstituicaoEstrangeira> existingInstituicaoOpt = instituicaoEstrangeiraRepository.findById(id);
+        Optional<Instituicao> instituicaoOptional = instituicaoRepository.findById(id);
 
-        if (existingInstituicaoOpt.isPresent()) {
-            InstituicaoEstrangeira existingInstituicao = existingInstituicaoOpt.get();
+        if (instituicaoOptional.isPresent()) {
+            Instituicao instituicao = instituicaoOptional.get();
+            Optional<InstituicaoEstrangeira> instituicaoEstrangeiraOptional = instituicaoEstrangeiraRepository.findByInstituicao(instituicao);
 
-            // Garantir que o país não seja alterado para Brasil
-            if ("Brasil".equals(existingInstituicao.getPais())) {
-                throw new IllegalArgumentException("Não é possível alterar uma instituição estrangeira para brasileira.");
+            if (instituicaoEstrangeiraOptional.isPresent()) {
+                InstituicaoEstrangeira existingInstituicao = instituicaoEstrangeiraOptional.get();
+
+                // Garantir que o país não seja alterado para o Brasil
+                if ("Brasil".equals(existingInstituicao.getPais())) {
+                    throw new IllegalArgumentException("Não é possível alterar uma instituição estrangeira para brasileira.");
+                }
+
+                // Validações comuns
+                instituicaoService.validateNome(updatedInstituicao.getInstituicao().getNome());
+                instituicaoService.validateSigla(updatedInstituicao.getInstituicao().getSigla());
+
+                // Validação do CEP (não obrigatório)
+                if (updatedInstituicao.getCep() != null && !CEP_PATTERN.matcher(updatedInstituicao.getCep()).matches()) {
+                    throw new IllegalArgumentException("O CEP deve ter no máximo 9 caracteres numéricos.");
+                }
+
+                // Validação de campos obrigatórios
+                validateCamposObrigatorios(updatedInstituicao);
+
+                // Atualizando os campos permitidos
+                existingInstituicao.getInstituicao().setNome(updatedInstituicao.getInstituicao().getNome());
+                existingInstituicao.getInstituicao().setSigla(updatedInstituicao.getInstituicao().getSigla());
+                existingInstituicao.setCep(updatedInstituicao.getCep());
+                existingInstituicao.setLogradouro(updatedInstituicao.getLogradouro());
+                existingInstituicao.setEstadoRegiao(updatedInstituicao.getEstadoRegiao());
+                existingInstituicao.setMunicipio(updatedInstituicao.getMunicipio());
+                existingInstituicao.setComplemento(updatedInstituicao.getComplemento());
+
+                return instituicaoEstrangeiraRepository.save(existingInstituicao);
+            } else {
+                throw new IllegalArgumentException("Instituição não encontrada.");
             }
-
-            // Validações comuns
-            instituicaoService.validateNome(updatedInstituicao.getInstituicao().getNome());
-            instituicaoService.validateSigla(updatedInstituicao.getInstituicao().getSigla());
-
-            // Validação do CEP (não obrigatório)
-            if (updatedInstituicao.getCep() != null && !CEP_PATTERN.matcher(updatedInstituicao.getCep()).matches()) {
-                throw new IllegalArgumentException("O CEP deve ter no máximo 9 caracteres numéricos.");
-            }
-
-            // Validação de campos obrigatórios
-            validateCamposObrigatorios(updatedInstituicao);
-
-            // Atualizando os campos permitidos
-            existingInstituicao.getInstituicao().setNome(updatedInstituicao.getInstituicao().getNome());
-            existingInstituicao.getInstituicao().setSigla(updatedInstituicao.getInstituicao().getSigla());
-            existingInstituicao.setCep(updatedInstituicao.getCep());
-            existingInstituicao.setLogradouro(updatedInstituicao.getLogradouro());
-            existingInstituicao.setEstadoRegiao(updatedInstituicao.getEstadoRegiao());
-            existingInstituicao.setMunicipio(updatedInstituicao.getMunicipio());
-            existingInstituicao.setComplemento(updatedInstituicao.getComplemento());
-
-            return instituicaoEstrangeiraRepository.save(existingInstituicao);
         } else {
             throw new IllegalArgumentException("Instituição não encontrada.");
         }
