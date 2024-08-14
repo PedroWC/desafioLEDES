@@ -3,20 +3,21 @@
   "properties": {
     "nome": {
       "type": "string",
-      "minLength": 3,
+      "maxLength": 32,
+      "minLength": 1,
       "description": "Nome da Instituição"
     },
     "sigla": {
       "type": "string",
-      "minLength": 2,
+      "maxLength": 8,
+      "minLength": 1,
       "description": "Sigla da Instituição"
     },
-    "cnpj": {
+    "pais": {
       "type": "string",
-      "minLength": 14,
-      "maxLength": 14,
-      "description": "CNPJ da Instituição"
+      "title": "País",
+      "description": "País da instituição"
     }
   },
-  "required": ["nome", "sigla", "cnpj"]
+  "required": ["nome", "sigla", "pais"]
 }

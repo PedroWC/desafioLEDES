@@ -1,26 +1,15 @@
 {
   "type": "VerticalLayout",
   "elements": [
+    { "type": "Control", "scope": "#/properties/nome" },
+    { "type": "Control", "scope": "#/properties/sigla" },
     {
-      "type": "Group",
-      "label": "Dados da Instituição",
-      "elements": [
-        {
-          "type": "Control",
-          "scope": "#/properties/nome",
-          "label": "Nome"
-        },
-        {
-          "type": "Control",
-          "scope": "#/properties/sigla",
-          "label": "Sigla"
-        },
-        {
-          "type": "Control",
-          "scope": "#/properties/cnpj",
-          "label": "CNPJ"
-        }
-      ]
+      "type": "Control",
+      "label": "País",
+      "scope": "#/properties/pais",
+      "options": {
+        "enum": []
+      }
     }
   ]
 }
